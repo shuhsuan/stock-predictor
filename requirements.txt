@@ -1,0 +1,7 @@
+pandas
+numpy
+scikit-learn
+yfinance
+pytest
+
+//install_with_pip_install_-r_requirements.txt
