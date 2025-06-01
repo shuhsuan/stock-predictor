@@ -2,24 +2,28 @@
 
 import yfinance as yf
 import pandas as pd
-from model_utils import add_features, train_model, predict_next_day
-
-#ze data
-data = yf.download("AAPL", start="2023-01-01", end="2025-01-01")
-data = data[['Close']]
-
-#features and target
-df = add_features(data)
-
-#train model
-model, accuracy = train_model(df)
-
-#predict tomorrow
-latest_data = df.iloc[-1:]
-prediction = predict_next_day(model, latest_data)
+from model_utils import add_features, train_model, predict_for_date, evaluate_accuracy
 
 
-print(f"Predicted next movement: {prediction}, Accuracy: {accuracy:.2f}")
+ticker = input("Enter stock ticker (eg. AAPL): ")
+date_input = input("Enter date (YYYY-MM-DD): ")
+
+data = yf.download(ticker, start="2010-01-01", end="2024-12-31")
+data = data[["Close"]]
+data.columns = ["Close"]
+data = add_features(data)
+
+models = train_model(data)
+predictions = predict_for_date(data, models, pd.to_datetime(date_input))
+accuracies = evaluate_accuracy(data, models)
+
+if predictions:
+    print(f"\nPredictions for {ticker.upper()} after {date_input}: (based on data from Jan 2010 - Dec 2024)")
+    for time_frame, result in predictions.items():
+        print(f" {time_frame}: {result} (Accuracy: {accuracies[time_frame]})")
+else:
+    print("No predictions could be made for the selected date :(")
+    print("Available dates:", data.index[-5:])
 
 
 
