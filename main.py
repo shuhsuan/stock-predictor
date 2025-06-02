@@ -6,7 +6,7 @@ from model_utils import add_features, train_model, predict_for_date, evaluate_ac
 import logging
 
 
-logging.basicConfig(fileName='predictions.log', level=logging.INFO)
+logging.basicConfig(filename='predictions.log', level=logging.INFO)
 
 ticker = input("Enter stock ticker (eg. AAPL): ")
 date_input = input("Enter date (YYYY-MM-DD): ")
@@ -23,7 +23,10 @@ if predictions:
     vol = predictions.pop("5 day volatility", None)
     print(f"\nPredictions for {ticker.upper()} after {date_input}: (based on data from Jan 2010 - Dec 2024)")
     for time_frame, result in predictions.items():
-        print(f" {time_frame}: {result} (Accuracy: {accuracies[time_frame]})")
+        if time_frame in accuracies:
+            print(f" {time_frame}: {result} (Accuracy: {accuracies[time_frame]})")
+        else: 
+            print(f" {time_frame}: {result}")
         logging.info(f"{ticker} on {date_input} - {time_frame}: {result}")
     if vol:
         print(f"\n5 day Volatility on {date_input}: {vol}")
