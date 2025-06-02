@@ -58,6 +58,9 @@ def predict_for_date(df, models, date):
     for target, model in models.items():
         prediction = model.predict(latest_data[features])
         results[target] = "Up" if prediction[0] == 1 else "Down"
+    
+    volatility = df["Close"].pct_change().rolling(window=5).std().loc[date]
+    results["5-day Volatility"] = f"{volatility:.2%}"
 
     return results
 
@@ -73,3 +76,11 @@ def evaluate_accuracy(df, models):
         accuracy_scores[target] = round(accuracy, 2)
 
     return accuracy_scores
+
+def run_etl(ticker):
+    import yfinance as yf
+    df = yf.download(ticker, period="1y", interval="1d", auto_adjust=True)
+    df = df[["Close"]]
+    df.index.name = "Date"
+    return add_features(df)
+
